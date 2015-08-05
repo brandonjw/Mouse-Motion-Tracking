@@ -17,7 +17,11 @@ ap.add_argument("-a", "--min-area", type=int, default=500, help="minimum area si
 args = vars(ap.parse_args())
 #f=file('coord22.txt','w')
 img = None
-#cordtext= None
+coordtext = None
+xgreater = False
+xless = False
+ygreater = False
+yless = False
 #this list will contain the coords for the center of the mouse in each frame. this allows you to compare center cords, recent vs present
 #the initial values act as initializers
 centerlist=[(0,1),(2,3),(4,5),(5,6),(7,8)]
@@ -114,41 +118,76 @@ while True:
 #        comma.join(jointhis)
 #        cv2.putText(frame , comma.join(jointhis), (x,y),cv2.FONT_HERSHEY_SIMPLEX, .5,(0,0,255))      
         
-        '''
-        tries to solve mouse standing still problem
-        just realized that for line 128, it does not go on to the next iteration. Need to fix that
-        '''
+        
+        #tries to solve mouse standing still problem
         #subtracts the present x coord from the fourth to last frame's x value
         group1=abs(center[0] - centerlist[-4][0])
         
 #        subtracts the present y coord from the fourth to last frame's y value
         group2=abs(center[1] - centerlist[-4][1])
         
-#       the mindset here is that if the change in both x and y values are less than 5, then the mouse is standing still
+#        the mindset here is that if the change in both x and y values are less than 5, then the mouse is standing still
         #if standing still, then make it so that the head cords do not move
         if abs(group1-group2) < 5:
-            img
+#            print 'standing still'
+            img3 = cv2.circle(frame,center,radius/20,(0,255,0),2)
+            cv2.putText(frame , str(center), center,cv2.FONT_HERSHEY_SIMPLEX, .5,(0,0,255))
+            centerlist.append(center)
             
+            if xgreater == True:
+                img = cv2.circle(frame,coord34,radius/20,(255,200,0),2)
+                coordtext = cv2.putText(frame , coord34str, coord34,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+            if xless == True:
+                img = cv2.circle(frame,coord12,radius/20,(255,200,0),2)
+                coordtext = cv2.putText(frame , coord12str, coord12,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+            if ygreater == True:
+                img = cv2.circle(frame,coord78,radius/20,(255,200,0),2)
+                coordtext = cv2.putText(frame , coord78str, coord78,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+            if yless == True:
+                img = cv2.circle(frame,coord56,radius/20,(255,200,0),2)
+                coordtext = cv2.putText(frame , coord56str, coord56,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+            continue
             #             x value                          y value               if greater change in x value versus y value...
         if abs(center[0] - centerlist[-1][0]) > abs(center[1] - centerlist[-1][1]): #compares present x and y values, compared to their respective recent past values
             if center[0] > centerlist[-1][0]:#if present center x value is greater than previous x value... want highest x value
                 img = cv2.circle(frame,coord34,radius/20,(255,200,0),2)
-                cv2.putText(frame , coord34str, coord34,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+                coordtext = cv2.putText(frame , coord34str, coord34,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+#                print 'moving'
+                xgreater = True
+                xless = False
+                ygreater = False
+                yless = False
             else:
                 img = cv2.circle(frame,coord12,radius/20,(255,200,0),2)
-                cv2.putText(frame , coord12str, coord12,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+                coordtext = cv2.putText(frame , coord12str, coord12,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+#                print 'moving'
+                xgreater = False
+                xless = True
+                ygreater = False
+                yless = False
         else:
             if center[1] > centerlist[-1][1]: #if present center y value is greater than previous y value, you want the higher y value
                 img = cv2.circle(frame,coord78,radius/20,(255,200,0),2)
-                cv2.putText(frame , coord78str, coord78,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+                coordtext = cv2.putText(frame , coord78str, coord78,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+#                print 'moving'
+                xgreater = False
+                xless = False
+                ygreater = True
+                yless = False
             else:
                 img = cv2.circle(frame,coord56,radius/20,(255,200,0),2)
-                cv2.putText(frame , coord56str, coord56,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+                coordtext = cv2.putText(frame , coord56str, coord56,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+#                print 'moving' 
+                xgreater = False
+                xless = False
+                ygreater = False
+                yless = True
                 
         centerlist.append(center)
 
         
 #        show center circle + coord text        
+    
         img3 = cv2.circle(frame,center,radius/20,(0,255,0),2)
         cv2.putText(frame , str(center), center,cv2.FONT_HERSHEY_SIMPLEX, .5,(0,0,255))
         
@@ -159,11 +198,10 @@ while True:
     # draws mouse contours
 #    cv2.drawContours(frame, cnts, -1, (255,255,0), 3)
 
-
     cv2.imshow("Main", frame)
     cv2.imshow("Thresh", thresh)
 #    cv2.imshow("Frame Delta", frameDelta)
-    cv2.imwrite('frame.jpg', frame)
+#    cv2.imwrite('frame4945.jpg', frame)
 
     # if the `esc` key is pressed, break from the loop
     key = cv2.waitKey(7) % 0x100
