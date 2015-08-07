@@ -15,7 +15,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("-v", "--video", help="path to the video file")
 ap.add_argument("-a", "--min-area", type=int, default=500, help="minimum area size")
 args = vars(ap.parse_args())
-#f=file('coord22.txt','w')
+f=file('mmd3.txt','w')
 img = None
 coordtext = None
 xgreater = False
@@ -25,7 +25,7 @@ yless = False
 #this list will contain the coords for the center of the mouse in each frame. this allows you to compare center cords, recent vs present
 #the initial values act as initializers
 centerlist=[(0,1),(2,3),(4,5),(5,6),(7,8)]
-
+headcoord=[(0,1), (1,2), (3,4)]
 # if the video argument is None, then we are reading from webcam
 if args.get("video", None) is None:
     camera = cv2.VideoCapture(0)
@@ -70,6 +70,7 @@ while True:
 
     # loop over the contours
     for c in cnts:
+        #        print c
         # if the contour is too small, ignore it
         if cv2.contourArea(c) < args["min_area"]:
             continue
@@ -107,9 +108,6 @@ while True:
         if center[0] == 558:
             continue
         
-#        f.write(str(center))
-#        f.write('\n')
-        
         #bounding rectangle
 #        (x, y, w, h) = cv2.boundingRect(c)
 #        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
@@ -119,7 +117,7 @@ while True:
 #        cv2.putText(frame , comma.join(jointhis), (x,y),cv2.FONT_HERSHEY_SIMPLEX, .5,(0,0,255))      
         
         
-        #tries to solve mouse standing still problem
+        #solves mouse standing still problem
         #subtracts the present x coord from the fourth to last frame's x value
         group1=abs(center[0] - centerlist[-4][0])
         
@@ -127,9 +125,8 @@ while True:
         group2=abs(center[1] - centerlist[-4][1])
         
 #        the mindset here is that if the change in both x and y values are less than 5, then the mouse is standing still
-        #if standing still, then make it so that the head cords do not move
+        #if standing still, then make it so that the head cords do not move (keep choosing the same direction as forward)
         if abs(group1-group2) < 5:
-#            print 'standing still'
             img3 = cv2.circle(frame,center,radius/20,(0,255,0),2)
             cv2.putText(frame , str(center), center,cv2.FONT_HERSHEY_SIMPLEX, .5,(0,0,255))
             centerlist.append(center)
@@ -137,55 +134,138 @@ while True:
             if xgreater == True:
                 img = cv2.circle(frame,coord34,radius/20,(255,200,0),2)
                 coordtext = cv2.putText(frame , coord34str, coord34,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+                headcoord.append(coord34)
+                continue
             if xless == True:
                 img = cv2.circle(frame,coord12,radius/20,(255,200,0),2)
                 coordtext = cv2.putText(frame , coord12str, coord12,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+                headcoord.append(coord12)
+                continue
             if ygreater == True:
                 img = cv2.circle(frame,coord78,radius/20,(255,200,0),2)
                 coordtext = cv2.putText(frame , coord78str, coord78,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+                headcoord.append(coord78)
+                continue
             if yless == True:
                 img = cv2.circle(frame,coord56,radius/20,(255,200,0),2)
                 coordtext = cv2.putText(frame , coord56str, coord56,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+                headcoord.append(coord56)
+                continue
+                
             continue
+        
+         
             #             x value                          y value               if greater change in x value versus y value...
         if abs(center[0] - centerlist[-1][0]) > abs(center[1] - centerlist[-1][1]): #compares present x and y values, compared to their respective recent past values
             if center[0] > centerlist[-1][0]:#if present center x value is greater than previous x value... want highest x value
-                img = cv2.circle(frame,coord34,radius/20,(255,200,0),2)
-                coordtext = cv2.putText(frame , coord34str, coord34,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
-#                print 'moving'
                 xgreater = True
                 xless = False
                 ygreater = False
                 yless = False
+                headcoord.append(coord34)
             else:
-                img = cv2.circle(frame,coord12,radius/20,(255,200,0),2)
-                coordtext = cv2.putText(frame , coord12str, coord12,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
-#                print 'moving'
                 xgreater = False
                 xless = True
                 ygreater = False
                 yless = False
+                headcoord.append(coord12)
         else:
             if center[1] > centerlist[-1][1]: #if present center y value is greater than previous y value, you want the higher y value
-                img = cv2.circle(frame,coord78,radius/20,(255,200,0),2)
-                coordtext = cv2.putText(frame , coord78str, coord78,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
-#                print 'moving'
                 xgreater = False
                 xless = False
                 ygreater = True
                 yless = False
+                headcoord.append(coord78)
             else:
+                xgreater = False
+                xless = False
+                ygreater = False
+                yless = True
+                headcoord.append(coord56)
+
+                
+        group3=abs(headcoord[-1][0] - headcoord[-2][0])
+        group4=abs(headcoord[-1][1] - headcoord[-2][1])
+        #if head coord change is greater than 60, use the opposite direction as the forward direction
+        if abs(group3 + group4) > 60:
+#            print 'jumped'
+            if xgreater == True:
+                img = cv2.circle(frame,coord12,radius/20,(255,200,0),2)
+                coordtext = cv2.putText(frame , coord12str, coord12,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+                del headcoord[-1]
+                headcoord.append(coord12)
+                xgreater = False
+                xless = True
+                ygreater = False
+                yless = False
+                
+                centerlist.append(center)
+                img3 = cv2.circle(frame,center,radius/20,(0,255,0),2)
+                cv2.putText(frame , str(center), center,cv2.FONT_HERSHEY_SIMPLEX, .5,(0,0,255))
+                continue
+            if xless == True:
+                img = cv2.circle(frame,coord34,radius/20,(255,200,0),2)
+                coordtext = cv2.putText(frame , coord34str, coord34,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+                del headcoord[-1]
+                headcoord.append(coord34)
+                xgreater = True
+                xless = False
+                ygreater = False
+                yless = False
+                
+                centerlist.append(center)
+                img3 = cv2.circle(frame,center,radius/20,(0,255,0),2)
+                cv2.putText(frame , str(center), center,cv2.FONT_HERSHEY_SIMPLEX, .5,(0,0,255))
+                continue
+            if ygreater == True:
                 img = cv2.circle(frame,coord56,radius/20,(255,200,0),2)
                 coordtext = cv2.putText(frame , coord56str, coord56,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
-#                print 'moving' 
+                del headcoord[-1]
+                headcoord.append(coord56)
                 xgreater = False
                 xless = False
                 ygreater = False
                 yless = True
                 
-        centerlist.append(center)
+                centerlist.append(center)
+                img3 = cv2.circle(frame,center,radius/20,(0,255,0),2)
+                cv2.putText(frame , str(center), center,cv2.FONT_HERSHEY_SIMPLEX, .5,(0,0,255))
+                continue
+            if yless == True:
+                img = cv2.circle(frame,coord78,radius/20,(255,200,0),2)
+                coordtext = cv2.putText(frame , coord78str, coord78,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+                del headcoord[-1]
+                headcoord.append(coord78)
+                xgreater = False
+                xless = False
+                ygreater = True
+                yless = False
+                
+                centerlist.append(center)
+                img3 = cv2.circle(frame,center,radius/20,(0,255,0),2)
+                cv2.putText(frame , str(center), center,cv2.FONT_HERSHEY_SIMPLEX, .5,(0,0,255))
+                continue
+                
+                  
+        else:
+            if xgreater == True:
+                img = cv2.circle(frame,coord34,radius/20,(255,200,0),2)
+                coordtext = cv2.putText(frame , coord34str, coord34,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
 
-        
+            if xless == True:
+                img = cv2.circle(frame,coord12,radius/20,(255,200,0),2)
+                coordtext = cv2.putText(frame , coord12str, coord12,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+
+            if ygreater == True:
+                img = cv2.circle(frame,coord78,radius/20,(255,200,0),2)
+                coordtext = cv2.putText(frame , coord78str, coord78,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+
+            if yless == True:
+                img = cv2.circle(frame,coord56,radius/20,(255,200,0),2)
+                coordtext = cv2.putText(frame , coord56str, coord56,cv2.FONT_HERSHEY_SIMPLEX, .5,(130,70,180))
+                
+
+        centerlist.append(center)
 #        show center circle + coord text        
     
         img3 = cv2.circle(frame,center,radius/20,(0,255,0),2)
@@ -199,14 +279,17 @@ while True:
 #    cv2.drawContours(frame, cnts, -1, (255,255,0), 3)
 
     cv2.imshow("Main", frame)
-    cv2.imshow("Thresh", thresh)
+#    cv2.imshow("Thresh", thresh)
 #    cv2.imshow("Frame Delta", frameDelta)
-#    cv2.imwrite('frame4945.jpg', frame)
+    cv2.imwrite('frame4945.jpg', frame)
 
     # if the `esc` key is pressed, break from the loop
     key = cv2.waitKey(7) % 0x100
     if key == 27 or key == 10:
-#        f.close()
+        for cord in headcoord:
+            f.write(str(cord))
+            f.write('\n')
+        f.close()
         break
 
 # cleanup the camera and close any open windows
