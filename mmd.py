@@ -5,6 +5,7 @@
  
  python mmd.py -v output.avi
  
+
 '''
 #from __future__ import division
 import argparse
@@ -153,58 +154,7 @@ while True:
             continue
         if center[0] == 558:
             continue
-            
         
-        
-        #tries to solve mouse standing still problem
-        #subtracts the present x coord from the fourth to last frame's x value
-        group1=abs(center[0] - centerlist[-4][0])
-        
-#        subtracts the present y coord from the fourth to last frame's y value
-        group2=abs(center[1] - centerlist[-4][1])
-        
-#        the mindset here is that if the change in both x and y values are less than 5, then the mouse is standing still
-        #if standing still, then make it so that the head cords do not move (keep choosing the same direction as forward)
-        if abs(group1-group2) < 5:
-#            drawcoord(frame,center,radius,circlecolor2,textcolor2)
-            centerlist.append(center)
-            if xgreater == True:
-                drawcoord(frame,coord34,radius,circlecolor,textcolor)
-                headcoord.append(coord34)
-                estimheadcoord(estheadcoordlist,velocitylist,headcoord,.033,.1)
-                estheadcoordlist.append(estheadcoord)
-                estvelocity(velocitylist,estheadcoordlist,.033,.05)
-                velocitylist.append(still)
-                drawcoord(frame,estheadcoord,radius,circlecolor3,textcolor3)
-                continue
-            if xless == True:
-                drawcoord(frame,coord12,radius,circlecolor,textcolor)
-                headcoord.append(coord12)
-                estimheadcoord(estheadcoordlist,velocitylist,headcoord,.033,.1)
-                estheadcoordlist.append(estheadcoord)
-                estvelocity(velocitylist,estheadcoordlist,.033,.05)
-                velocitylist.append(still)
-                drawcoord(frame,estheadcoord,radius,circlecolor3,textcolor3)
-                continue
-            if ygreater == True:
-                drawcoord(frame,coord78,radius,circlecolor,textcolor)
-                headcoord.append(coord78)
-                estimheadcoord(estheadcoordlist,velocitylist,headcoord,.033,.1)
-                estheadcoordlist.append(estheadcoord)
-                estvelocity(velocitylist,estheadcoordlist,.033,.05)
-                velocitylist.append(still)
-                drawcoord(frame,estheadcoord,radius,circlecolor3,textcolor3)
-                continue
-            if yless == True:
-                drawcoord(frame,coord56,radius,circlecolor,textcolor)
-                headcoord.append(coord56)
-                estimheadcoord(estheadcoordlist,velocitylist,headcoord,.033,.1)
-                estheadcoordlist.append(estheadcoord)
-                estvelocity(velocitylist,estheadcoordlist,.033,.05)
-                velocitylist.append(still)
-                drawcoord(frame,estheadcoord,radius,circlecolor3,textcolor3)
-                continue
-            continue
         
          
             #             x value                          y value               if greater change in x value versus y value...
@@ -234,41 +184,47 @@ while True:
                 ygreater = False
                 yless = True
                 headcoord.append(coord56)
-  
-                
+        
+        #subtracts the present x coord from the fourth to last frame's x value
+        group1=abs(center[0] - centerlist[-4][0])
+        
+#        subtracts the present y coord from the fourth to last frame's y value
+        group2=abs(center[1] - centerlist[-4][1])
+        
+        
                 
         group3=abs(headcoord[-1][0] - headcoord[-2][0])
         group4=abs(headcoord[-1][1] - headcoord[-2][1])
         #if measured head coord change has a difference greater than 30, there was a large jump
-        if abs(group3 + group4) > 30:
+        if abs(group3 + group4) > 30 or abs(group1-group2) < 5:
             estimheadcoord(estheadcoordlist,velocitylist,headcoord,.033,.1)
             estheadcoordlist.append(estheadcoord)
             estvelocity(velocitylist,estheadcoordlist,.033,.1)
             velocitylist.append(estvelo)
             drawcoord(frame,estheadcoord,radius,circlecolor3,textcolor3)
-            
-            if xgreater == True:
-                drawcoord(frame,coord34,radius,circlecolor,textcolor)
-            if xless == True:
-                drawcoord(frame,coord12,radius,circlecolor,textcolor)
-            if ygreater == True:
-                drawcoord(frame,coord78,radius,circlecolor,textcolor)
-            if yless == True:
-                drawcoord(frame,coord56,radius,circlecolor,textcolor)
+#            print velocitylist[-1]
+#            if xgreater == True:
+#                drawcoord(frame,coord34,radius,circlecolor,textcolor)
+#            if xless == True:
+#                drawcoord(frame,coord12,radius,circlecolor,textcolor)
+#            if ygreater == True:
+#                drawcoord(frame,coord78,radius,circlecolor,textcolor)
+#            if yless == True:
+#                drawcoord(frame,coord56,radius,circlecolor,textcolor)
                 
 #            drawcoord(frame,center,radius,circlecolor2, textcolor2)
             centerlist.append(center)
             continue
             
             
-        if xgreater == True:
-            drawcoord(frame,coord34,radius,circlecolor,textcolor)
-        if xless == True:
-            drawcoord(frame,coord12,radius,circlecolor,textcolor)
-        if ygreater == True:
-            drawcoord(frame,coord78,radius,circlecolor,textcolor)
-        if yless == True:
-            drawcoord(frame,coord56,radius,circlecolor,textcolor)   
+#        if xgreater == True:
+#            drawcoord(frame,coord34,radius,circlecolor,textcolor)
+#        if xless == True:
+#            drawcoord(frame,coord12,radius,circlecolor,textcolor)
+#        if ygreater == True:
+#            drawcoord(frame,coord78,radius,circlecolor,textcolor)
+#        if yless == True:
+#            drawcoord(frame,coord56,radius,circlecolor,textcolor)   
         
 
         
@@ -279,8 +235,9 @@ while True:
         estvelocity = (previous velocity)*(1-alpha1) + [(estimated headcoordinate from above equation - previous estimated head coordinate) / time]*alpha1
         '''
         #moving
-        estimheadcoord(estheadcoordlist,velocitylist,headcoord,.033,.3)
+        estimheadcoord(estheadcoordlist,velocitylist,headcoord,.033,.35)
         estheadcoordlist.append(estheadcoord)
+
 
         estvelocity(velocitylist,estheadcoordlist,.033,.1)
         velocitylist.append(estvelo)
@@ -292,7 +249,7 @@ while True:
     
 #        drawcoord(frame,center,radius,circlecolor2, textcolor2)
         centerlist.append(center)
-        
+#        print velocitylist[-1]
     # draw the text and timestamp on the frame
     cv2.putText(frame, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
         (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (255, 255, 226), 1)
