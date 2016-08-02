@@ -2,48 +2,8 @@
  USAGE WinPython command prompt
  python mmd.py
  python mmd.py --video videos/example_01.avi
- 
  python mmd.py -v output.avi
- 
-POSSIBLE PROBLEM:
-timeEnd only registers when the mouse leaves the target zone
-so... don't end the trial when mice is located at the target zone
-
-possible fix?
-if in target zone when time runs out:
-    time now - initial time in zone?
-
-while True: #initialize valves before the while loop
-    if all valves are False:
-        send arduino signal to turn valve1 on
-        valve1ON = True
-        initial time = time.time()
-    if valve1ON = True and time.time() - initial time >= 4min:
-        valve1ON = False
-        send signal to turn off valve1
-        turn on valve2
-        valve2ON = True
-        initial time = time.time()
-    if valve2ON = True and time.time() - initial time >= 4min:
-        valve2ON = False
-        send signal to turn off valve2
-        start from first valve since everything is now False
-        
-        
-attempt to combine motion tracking with primarily trying to find the 5 valves
-
-
-This version update accounted for the valve times after pressing esc
-
-Update 5/22/16:added Timer Events to control the valves
-Make sure to update what happens when the mouse stays at a valve for too long because idk which numbers correspond
-check when 'esc' is pressed and update the correct valves for sendstring('turnvalveoff')
-
-line 225: replace vtime with the time you want in between valves (random)
-
-
-
-
+line 225: replace vtime with the time you want in between valves (random for now)
 
 make it so that when esc is pressed tells you how long each valve was on for
 '''
@@ -58,14 +18,13 @@ import thread
 import serial
 import random
 
-
-
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-v", "--video", help="path to the video file")
 ap.add_argument("-a", "--min-area", type=int, default=500, help="minimum area size")
 args = vars(ap.parse_args())
 f=file('mmd4.txt','w')
+#initialize
 img = None
 xgreater = False
 xless = False
@@ -83,7 +42,6 @@ circlecolor3=(0,0,255) #red
 circlecolor4=(255,255,150) #light cucumber
 
 #this list will contain the coords for the center of the mouse in each frame. this allows you to compare center cords, recent vs present
-#the initial values act as initializers
 centerlist=[(0,1),(2,3),(4,5),(5,6),(7,8)]
 centerlist2=[]
 headcoord=[(0,1), (1,2), (0,0)]
@@ -285,14 +243,13 @@ f.write('\n')
 n=1
 
 
-#arduino = serial.Serial('COM3', 9600)
+arduino = serial.Serial('COM3', 9600)
 
 
-#threading.Thread(target = controlvalve(vtime)).start()
+threading.Thread(target = controlvalve(vtime)).start()
 
 
 while True:
-#    print 'wow'
     # looks for data input from arduino and then prints it
     # example:arduino tells python that it turned on/off a valve
 #    data = arduino.readline()[:-2]
@@ -413,7 +370,7 @@ while True:
   
 
     # loop over the contours
-#'''low threshold'''C:\Users\Sap\Desktop\olfactometer_v2
+#'''low threshold'''
     for c in cnts:
 #        # if the contour is too small, ignore it
 ##        if cv2.contourArea(c) > 5000:
@@ -467,6 +424,7 @@ while True:
         else:
             coord2 = (sortedcordlist[-1][0][0],sortedcordlist[-1][0][1])
             headcoord.append(coord2) #append the highest x contour
+            
     #if x value is less than y value
     if abs(sumofbox[0]) < abs(sumofbox[1]): #want y value
         if sumofbox[1] > 0:
@@ -494,7 +452,7 @@ while True:
     for k,v in circleDict.iteritems():
         
         cv2.circle(frame, (v['x'],v['y']), v['r'], (0,255,0),2)
-        
+    #if mouse is located at the top left valve
     if topLeft == True:
         if (headcoord[-1][0] - circleDict['topleft']['x'])**2 + (headcoord[-1][1] - circleDict['topleft']['y'])**2 <= circleDict['topleft']['r']**2:
             print 'TOP LEFT'
