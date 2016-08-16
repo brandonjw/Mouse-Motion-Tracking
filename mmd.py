@@ -312,7 +312,7 @@ while True:
         for i in circles[0,:]:
             xvalue = i[0]
             yvalue = i[1]
-            radiusOfficial = i[2]
+            radiusOfficial = i[2]+30
             centerXY=(xvalue,yvalue,radiusOfficial)
             centerXYstr=str(centerXY)
             centerlist2.append(centerXY)
