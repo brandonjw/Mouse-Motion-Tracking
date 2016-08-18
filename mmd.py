@@ -169,26 +169,12 @@ def controlvalve(vtime): # run this the whole time. vtime = time that a valve is
                 randomValve = random.choice(valveList)
                 numberPicked = True
                 
-            if randomValve == 9 and numberPicked == False: #makes it so that the program doesn't pick the same valve twice
-#                randomValve = (randrange(10,11))
-                valveList.remove(9)
-                randomValve = random.choice(valveList)
-                numberPicked = True
-            if randomValve == 10 and numberPicked == False:
-#                randomValve = (randrange(9,10))
-                valveList.remove(10)
-                randomValve = random.choice(valveList)
-                numberPicked = True
-            if randomValve == 11 and numberPicked == False:
-#                randomValve = (randrange(9,10))
-                valveList.remove(11)
-                randomValve = random.choice(valveList)
-                numberPicked = True
-            if randomValve == 12 and numberPicked == False:
-#                randomValve = (randrange(9,10))
-                valveList.remove(12)
-                randomValve = random.choice(valveList)
-                numberPicked = True
+            for valveNumber in valveList: #makes it so that the program doesn't pick the same valve twice
+                if numberPicked == False:
+                    if randomValve == valveNumber:
+                        valveList.remove(valveNumber)
+                        randomValve = random.choice(valveList)
+                        numberPickedd = True
                 
                 #see what number is picked, and then turn on that valve corresponding to that number
             if randomValve == 9:
