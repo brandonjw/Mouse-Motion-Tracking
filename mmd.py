@@ -1,4 +1,6 @@
 '''
+Adapted and modified from Adrian Rosebrock’s basic motion detection and tracking program
+
  USAGE WinPython command prompt
  python mmd.py
  python mmd.py --video videos/example_01.avi
@@ -6,6 +8,8 @@
 line 225: replace vtime with the time you want in between valves (random for now)
 
 make it so that when esc is pressed tells you how long each valve was on for
+
+
 '''
 #from __future__ import division
 import argparse
