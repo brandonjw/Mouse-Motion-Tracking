@@ -24,6 +24,7 @@ import math
 ap = argparse.ArgumentParser()
 ap.add_argument("-v", "--video", help="path to the video file")
 ap.add_argument("-a", "--min-area", type=int, default=500, help="minimum area size")
+ap.add_argument("-svalve", "--sValve", help="strawberry valve") #topLeft, topRight, botLeft, botRight
 args = vars(ap.parse_args())
 timestr = time.strftime("%Y%m%d-%H%M%S")
 f = open(timestr + '.txt', 'w')
@@ -701,8 +702,14 @@ while True:
             midCenter = False
             midCenterEnd = time.time()
             timeMidCenter += midCenterEnd - midCenterStart    
-#            sendString('13off')                     
-            
+#            sendString('13off')               
+
+        sberryValve = ('Strawberry Valve', args["sValve"])
+        sberryValveJoined = (':').join(sberryValve)
+        f.write(str(sberryValveJoined))
+        f.write('\n')
+        print sberryValveJoined       
+ 
         stopValve = True
         print start
         end = time.time()
