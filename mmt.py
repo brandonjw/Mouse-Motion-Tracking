@@ -41,7 +41,7 @@ textColor=(0,0,255) #red
 textColor2=(0,255,0) #green
 textColor3=(255,0,0)# dark blue
 circleColor=(0,255,0) #green
-circleColor2=(255,0,0) #dark blue
+circleColor2=(255,114,0) #dark blue
 circleColor3=(0,0,255) #red
 circleColor4=(255,255,150) #light cucumber
 
@@ -427,7 +427,7 @@ while True:
         continue
     if headCoord[-1] == (515,418):
         continue
-    drawcoord(frame,headCoord[-1],radius, circleColor, textColor)
+    drawcoord(frame,headCoord[-1],radius, circleColor2, textColor)
 #    print headCoord[-1], '|', datetime.datetime.now().strftime('%H:%M:%S.%f')[:-3]
     
 #    for item in range(len(valveCenter)):
